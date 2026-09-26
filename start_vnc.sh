@@ -66,7 +66,7 @@ sleep 1
 
 # Check if Xvfb is still running (i.e., it didn't crash)
 if ! kill -0 $XVFB_PID 2>/dev/null; then
-    echo "❌ Failed to start Xvfb on display $DISPLAY_NUM"
+    echo "❌ Failed to start Xvfb on display $DISPLAY"
     exit 1
 fi
 
@@ -88,6 +88,14 @@ if $DOCKER; then
     xset s off || true
     xset -dpms || true
     xset s noblank || true
+
+    # Set wallpaper
+    WALLPAPER=/usr/share/backgrounds/wallpaper.png
+    if [ -f "$WALLPAPER" ]; then
+        for prop in $(xfconf-query -c xfce4-desktop -l | grep 'last-image$'); do
+            xfconf-query -c xfce4-desktop -p "$prop" -s "$WALLPAPER" || true
+        done
+    fi
 
     echo "[INFO] XFCE screensaver and lock screen disabled."
 fi
